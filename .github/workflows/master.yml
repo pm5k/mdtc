@@ -35,6 +35,7 @@ jobs:
       run: |
         poetry run pytest -vvv tests
     - name: Publish GH pages
+      if: github.event_name == 'push' && github.ref == 'refs/heads/master'
       run: |
         poetry run mkdocs gh-deploy --force
 
