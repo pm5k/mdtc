@@ -15,8 +15,8 @@ disallow_untyped_defs = true
 [tool.poetry]
 name = "mdtc"
 version = "0.1.0"
-description = ""
-authors = ["pm5k <github.com/pm5k>"]
+description = "A model-driven configuration object for TOML or dict-based configs."
+authors = ["pm5k"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
