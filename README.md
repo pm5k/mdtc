@@ -6,6 +6,8 @@ A lightweight config singleton meant for storing your application's config state
 You can pass this object around across your entire app and not worry about config mutations, unvalidated config values or lack of IDE completions.
 Originally meant for use with TOML key/value-based configs, but any k/v object should work as long as it complies with the model.
 
+The source documentation can be found [here](https://pm5k.github.io/mdtc/)
+
 ## What is MDTC for?
 
 - Avoids having to use or chain `.get()` or retrieve config values via `cfg["foo"]["bar"]["baz"]`.
