@@ -1,11 +1,12 @@
 name: 'Test, Build and Deploy'
 on: [push]
 
+permissions:
+  contents: write
 
 jobs:
-
-  test-and-lint:
-    name: Flake8, MyPy, Pytest
+  test-lint-gen-docs:
+    name: Flake8, MyPy, Pytest, GH Pages
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -14,7 +15,8 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Install poetry
-      run: pip install poetry
+      run: |
+        pip install poetry
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
@@ -22,7 +24,7 @@ jobs:
         cache: 'poetry'
     - name: Install dependencies
       run: |
-        poetry install --with dev,test
+        poetry install --with dev,test,docs
     - name: flake8
       run: |
         poetry run flake8 mdtc
@@ -32,6 +34,9 @@ jobs:
     - name: pytest
       run: |
         poetry run pytest -vvv tests
+    - name: Publish GH pages
+      run: |
+        mkdocs gh-deploy --force
 
   # TODO: Future section for autodoc and push to PYPI..
   # build-and-deploy-to-pypi:
