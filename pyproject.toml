@@ -1,0 +1,46 @@
+[tool.black]
+max-line-length = 100
+target-version = ["py311"]
+
+[tool.isort]
+profile = "black"
+
+[tool.flake8]
+max-line-length = 100
+
+[tool.mypy]
+warn_unused_ignores = false
+disallow_untyped_defs = true
+
+[tool.poetry]
+name = "mdtc"
+version = "0.1.0"
+description = ""
+authors = ["pm5k <github.com/pm5k>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+
+[tool.poetry.group.dev.dependencies]
+mypy = "^1.0.0"
+flake8 = "^6.0.0"
+isort = "^5.12.0"
+black = "^23.1.0"
+pydantic = "^1.10.4"
+pre-commit = "^3.0.4"
+
+[tool.poetry.group.docs.dependencies]
+mkdocs = "^1.4.2"
+mkdocstrings = "^0.20.0"
+mkdocstrings-python = "^0.8.3"
+mkdocs-material = "^9.0.12"
+mkdocs-gen-files = "^0.4.0"
+
+[tool.poetry.group.test.dependencies]
+pytest = "^7.2.1"
+pydantic = "^1.10.4"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

@@ -1,0 +1,4 @@
+[foo]
+one=1
+two=["one", "two"]
+three={key=3}

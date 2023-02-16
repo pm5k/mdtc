@@ -1,0 +1,38 @@
+default_language_version:
+  python: python3
+default_stages:
+  - commit
+  - push
+repos:
+  # Pre-commit and plugins
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
+    hooks:
+      - id: detect-private-key
+        name: Detect private keys
+      - id: no-commit-to-branch
+        name: Don't commit to master
+  # Formatters
+  - repo: https://github.com/psf/black
+    rev: 23.1.0
+    hooks:
+      - id: black
+        args: ["--line-length", "100"]
+  - repo: https://github.com/pycqa/isort
+    rev: 5.12.0
+    hooks:
+      - id: isort
+        args: ["--profile", "black", "--filter-files"]
+        name: Sort imports with isort
+  # Linter
+  - repo: https://github.com/pycqa/flake8
+    rev: 6.0.0
+    hooks:
+      - id: flake8
+        name: "Linting using Flake8"
+  # Type checks using mypy
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.0.0
+    hooks:
+      - id: mypy
+        exclude: ^tests/
