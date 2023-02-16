@@ -4,6 +4,7 @@ MDTC - Model-driven TOML Configuration.
 
 A lightweight config singleton meant for storing your application's config state no matter where or how many times it is instantiated.
 You can pass this object around across your entire app and not worry about config mutations, unvalidated config values or lack of IDE completions.
+Originally meant for use with TOML key/value-based configs, but any k/v object should work as long as it complies with the model.
 
 ## What is MDTC for?
 
@@ -11,11 +12,11 @@ You can pass this object around across your entire app and not worry about confi
 - Code-completion-friendly via model-driven approach.
 - Custom configuration validation (either via Pydantic's interfaces or custom-built validators you define).
 - Immutable config state support. The config itself is immutable by default - you cannot replace `config.foo` with another value, for instance.
-- Supports nicer type hints instead of a huge TypeDict or another approach for a TOML config loaded into Python.
+- Supports nicer type hints instead of a huge TypeDict or another approach for a config dictionary loaded into Python.
 
 ## What MDTC is not for
 
-- It is not meant to replace other methods of loading TOML configs, it simply provides an alternative for housing your TOML config values.
+- It is not meant to replace other methods of loading TOML or dict configs, it simply provides an alternative for housing your TOML config values.
 - It is not meant as "less code". The guarantees it provides require a different implementation approach, and won't always result in less upfront code.
 - Codebases using other approaches or small configs won't benefit from this approach as much.
 
@@ -28,9 +29,10 @@ None, just the Python standard library.
 ### Simple Configuration
 
 ```py title="main.py"
+import tomllib # python3.11-only, use tomli for <=3.10
+
 from dataclasses import dataclass
 from mdtc import Config
-
 
 @dataclass
 class FooCfg:
@@ -44,13 +46,22 @@ class FooCfg:
 class MyConf(Config):
     misc: FooCfg
 
+cfg = """
+[config.misc]
+foo="bar"
+bar="baz"
+"""
 
-config = MyConf("example.toml")
+toml = tomllib.loads(cfg)
+
+config = MyConf(toml)
 ```
 
 ### Pydantic Models in your Configuration
 
 ```py title="main.py"
+import tomllib # python3.11-only, use tomli for <=3.10
+
 from pydantic import BaseModel
 from mdtc import Config
 
@@ -67,12 +78,22 @@ class MyConf(Config):
     misc: FooCfg
 
 
-config = MyConf("example.toml")
+cfg = """
+[config.misc]
+foo="bar"
+bar="baz"
+"""
+
+toml = tomllib.loads(cfg)
+
+config = MyConf(toml)
 ```
 
 ### Pydantic `dataclass` Example
 
 ```py title="main.py"
+import tomllib # python3.11-only, use tomli for <=3.10
+
 from pydantic import Field, validator
 from pydantic.dataclasses import dataclass
 
@@ -98,7 +119,15 @@ class MyConf(Config):
     misc: FooCfg
 
 
-config = MyConf("example.toml")
+cfg = """
+[config.misc]
+foo="bar"
+bar="baz"
+"""
+
+toml = tomllib.loads(cfg)
+
+config = MyConf(toml)
 ```
 
 ## Contributing

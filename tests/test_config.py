@@ -3,8 +3,10 @@
 # file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 
+import tomllib
 from collections.abc import Generator
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Any, Type, TypeAlias
 
 import pytest
@@ -13,11 +15,12 @@ from pydantic import BaseModel
 from mdtc import Config
 from mdtc.errors import (
     ConfigAttributeError,
+    ConfigKeyNotFoundError,
     FrozenConfigException,
-    TOMLKeyNotFoundError,
 )
 
-CONF_PATH: str = "tests/test.toml"
+CONF_PATH: str = Path("tests/test.toml").read_text()
+CONF_OBJ: dict[str, Any] = tomllib.loads(CONF_PATH)
 CONF_NAME_KEY: str = "foo"
 CONF_NAME_KEY_BAD: str = "coo"
 
@@ -142,7 +145,7 @@ def config_fixture() -> ConfigFixture:
     before another test run begins.
     """
 
-    regular: RegularConfs = (ConfigDC(CONF_PATH), ConfigPD(CONF_PATH))
+    regular: RegularConfs = (ConfigDC(CONF_OBJ), ConfigPD(CONF_OBJ))
     mismatch: Mismatches = (
         ConfigDCMismatchedFoo,
         ConfigPDMismatchedFoo,
@@ -158,17 +161,6 @@ def config_fixture() -> ConfigFixture:
 #
 # Tests
 #
-
-
-def test_bad_confpath() -> None:
-    """Test that not finding the config raises FileNotFound as expected."""
-    with pytest.raises(FileNotFoundError):
-        ConfigDC(CONF_PATH[::-1]).clear_instance()
-
-
-def test_good_confpath() -> None:
-    """Test that finding the config file raises no failures."""
-    ConfigDC(CONF_PATH).clear_instance()
 
 
 def test_cfg_as_expected(config_fixture: ConfigFixture) -> None:
@@ -197,17 +189,17 @@ def test_cfg_attr_mismatch(config_fixture: ConfigFixture) -> None:
     then try to initialise the config when:
 
     1: Config attr does not match model name.
-    2: Model key does not match any keys in TOML.
+    2: Model key does not match any keys in config dict.
     """
 
     # Sequential test
-    # First two should raise Model error last two should raise TOML attr error..
+    # First two should raise Model error last two should raise config key error..
     _, mismatches = config_fixture
 
     for mismatch in mismatches[:2]:
         with pytest.raises(ConfigAttributeError):
-            mismatch(CONF_PATH)  # type: ignore
+            mismatch(CONF_OBJ)  # type: ignore
 
     for mismatch in mismatches[2:]:
-        with pytest.raises(TOMLKeyNotFoundError):
-            mismatch(CONF_PATH)  # type: ignore
+        with pytest.raises(ConfigKeyNotFoundError):
+            mismatch(CONF_OBJ)  # type: ignore
