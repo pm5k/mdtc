@@ -36,7 +36,7 @@ jobs:
         poetry run pytest -vvv tests
     - name: Publish GH pages
       run: |
-        mkdocs gh-deploy --force
+        poetry run mkdocs gh-deploy --force
 
   # TODO: Future section for autodoc and push to PYPI..
   # build-and-deploy-to-pypi:
