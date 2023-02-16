@@ -4,7 +4,7 @@
 
 
 """
-## A model-driven singleton for storing TOML configuration.
+## A model-driven singleton for storing TOML or another dict-based configuration.
 
 Defines a Config class which is to be used for inheriting from.
 In order to maintain a single configuration instance across your entire application state,
@@ -18,15 +18,13 @@ Practically anything that can be instantiated and implements attribute getters a
 should work as a configuration definition.
 """
 
-import tomllib
 from functools import reduce
-from pathlib import Path
 from typing import Any, Callable, get_type_hints
 
 from mdtc.errors import (
     ConfigAttributeError,
+    ConfigKeyNotFoundError,
     FrozenConfigException,
-    TOMLKeyNotFoundError,
 )
 from mdtc.singleton import Singleton
 
@@ -36,27 +34,24 @@ class Config(Singleton):
     Ensures that only on instance of your configuration is present in your application.
 
     At the same time, it enforces a pattern of defining your configuration via model-driven
-    approach, where each TOML key is a pre-defined and pre-typed model of your configuration.
+    approach, where each key is a pre-defined and pre-typed model of your configuration.
     """
 
     __isfrozen: bool = False
-    __config_file: Path
 
-    def __init__(self, config_file: str) -> None:
+    def __init__(self, config_object: dict[str, Any]) -> None:
         """
         Initialise the configuration class using a file path and models.
 
         Args:
-            config_file (str): The path to your `toml` configuration file.
+            config_object (dict[str, Any]): The config dict (`toml` or other).
 
         Raises:
             ConfigAttributeError: Raised when a model `_name` does not match the attribute
             defined inside your configuration class.
-            TOMLKeyNotFoundError: Raised when a `_key` defined in the model is not found
-            in the TOML configuration.
+            ConfigKeyNotFoundError: Raised when a `_key` defined in the model is not found
+            in the configuration object.
         """
-        self.__config_file = Path(config_file)
-        __conf = tomllib.loads(self.__config_file.read_text())
         # Because defining a model in the config for typing purposes does not define a
         # default value (and should not!), we use `get_type_hints` to retrieve this
         # from the child class and check against what the model would have defined.
@@ -74,14 +69,14 @@ class Config(Singleton):
         for name, base in bases:
             if name != base._name:
                 raise ConfigAttributeError(
-                    f"The model - `{base.__name__}` says it's TOML key name is - `{base._name}`,"
+                    f"The model - `{base.__name__}` says it's confobj key name is - `{base._name}`,"
                     + f" but it has been declared as `{name}` inside `{self.__class__.__name__}`!"
                 )
 
-            if not (conf_dict := self.__get_cfg(base._key, __conf)):
-                raise TOMLKeyNotFoundError(
+            if not (conf_dict := self.__get_cfg(base._key, config_object)):
+                raise ConfigKeyNotFoundError(
                     f"The model - `{base.__name__}` asked to load a key - `{base._key}`"
-                    + f" however `{config_file}` does not contain such a key!"
+                    + " however the configuration does not contain such a key!"
                 )
 
             # Let the model throw own error on instantiation..
@@ -103,11 +98,11 @@ class Config(Singleton):
     @staticmethod
     def __get_cfg(key: str, cfg: dict[str, Any]) -> Any:
         """
-        Deep "get" from a n-depth dictionary using a TOML notation key.
+        Deep "get" from a n-depth dictionary using a TOML notation key ([A.B..]).
 
         Args:
             key (str): The TOML key for where the configuration is housed.
-            cfg (dict[str, Any]): The TOML dictionary parsed in from a file.
+            cfg (dict[str, Any]): The dictionary passed in to the config class.
 
         Returns:
             Any: An applicable ANY-type value or None if key is not found.
@@ -117,8 +112,4 @@ class Config(Singleton):
         return reduce(reducer, key.split("."), cfg)
 
     def __repr__(self) -> str:
-        return (
-            f"<{self.__class__.__name__}("
-            + f"hash={self.__hash__()},"
-            + f" file='{self.__config_file.absolute()}')>"
-        )
+        return f"<{self.__class__.__name__}(hash={self.__hash__()})>"
