@@ -1,3 +1,8 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+
 """
 ## A model-driven singleton for storing TOML configuration.
 
@@ -13,11 +18,10 @@ Practically anything that can be instantiated and implements attribute getters a
 should work as a configuration definition.
 """
 
+import tomllib
 from functools import reduce
 from pathlib import Path
 from typing import Any, Callable, get_type_hints
-
-import tomllib
 
 from mdtc.errors import (
     ConfigAttributeError,
