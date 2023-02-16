@@ -1,6 +1,7 @@
 __pycache__
 .mypy_cache
-poetry.toml
 .pytest_cache
 .venv
 .vscode
+dist
+poetry.toml
