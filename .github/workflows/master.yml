@@ -41,7 +41,7 @@ jobs:
 
   # TODO: Future section for autodoc and push to PYPI..
   build-and-deploy-to-pypi:
-    # if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
     name: Build and deploy to PYPI
     runs-on: ubuntu-latest
     needs: test-lint-gen-docs
@@ -59,11 +59,8 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
         cache: 'poetry'
-    - name: Install dependencies
+    - name: Publish to PyPI
       run: |
-        poetry install --only-root
-    - name: Publish to Test PyPI
-      run: |
-        poetry config repositories.test-pypi https://test.pypi.org/legacy/
-        poetry config pypi-token.test-pypi ${{ secrets.TEST_PYPI_TOKEN }}
-        poetry publish --build -r test-pypi
+        poetry config pypi-token.pypi ${{ secrets.PYPI_TOKEN }}
+        poetry version patch
+        poetry publish --build
