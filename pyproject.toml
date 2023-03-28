@@ -14,7 +14,7 @@ disallow_untyped_defs = true
 
 [tool.poetry]
 name = "mdtc"
-version = "0.1.1"
+version = "0.1.3"
 license = "MPL-2.0"
 description = "A model-driven configuration object for TOML or dict-based configs."
 authors = ["pm5k"]
@@ -24,7 +24,7 @@ documentation = "https://pm5k.github.io/mdtc/"
 repository = "https://github.com/pm5k/mdtc"
 
 [tool.poetry.dependencies]
-python = "^3.11"
+python = "^3.10"
 
 [tool.poetry.group.dev.dependencies]
 mypy = "^1.0.0"
