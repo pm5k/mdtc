@@ -3,13 +3,13 @@
 # file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 
-import tomllib
 from collections.abc import Generator
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Type, TypeAlias
 
 import pytest
+import toml
 from pydantic import BaseModel
 
 from mdtc import Config
@@ -20,7 +20,7 @@ from mdtc.errors import (
 )
 
 CONF_PATH: str = Path("tests/test.toml").read_text()
-CONF_OBJ: dict[str, Any] = tomllib.loads(CONF_PATH)
+CONF_OBJ: dict[str, Any] = toml.loads(CONF_PATH)
 CONF_NAME_KEY: str = "foo"
 CONF_NAME_KEY_BAD: str = "coo"
 
